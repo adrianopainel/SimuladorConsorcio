@@ -1,1 +1,997 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simulador Consórcio vs À Vista</title>
+  <style>
+:root {
+  --green-dark: #0f3d2e;
+  --green-mid: #1f7a63;
+  --yellow: #f2c94c;
+  --bg: #f5f7f9;
+  --text: #4f4f4f;
+  --white: #ffffff;
+  --border: #e0e0e0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Trebuchet MS", "Lucida Sans", "Tahoma", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.hero {
+  padding: 16px 20px 10px;
+  background: var(--green-dark);
+  color: var(--white);
+}
+
+.hero h1 {
+  margin: 4px 0 5px;
+  font-size: clamp(21px, 2.8vw, 30px);
+  letter-spacing: 0.4px;
+}
+
+.hero .subtitle {
+  margin: 0;
+  color: #e6efec;
+  font-size: 12.5px;
+}
+
+.eyebrow {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0;
+  color: #d7e5e1;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px 20px 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.card {
+  background: var(--white);
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+}
+
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--green-dark);
+}
+
+.grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.config-grid {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.field-group {
+  display: grid;
+  gap: 6px;
+  grid-column: span 2;
+}
+
+.field-group-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-group .hint {
+  margin-top: -1px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text);
+  position: relative;
+  z-index: 1;
+}
+
+.field input,
+.field select {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--white);
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 2px rgba(31, 122, 99, 0.12);
+}
+
+.field input[readonly],
+.field select[readonly] {
+  background: #f0f4f3;
+  color: #4b5b55;
+}
+
+.hint {
+  font-size: 10px;
+  color: #6b6b6b;
+}
+
+.results {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+}
+
+.result {
+  background: rgba(31, 122, 99, 0.1);
+  padding: 8px 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(31, 122, 99, 0.2);
+}
+
+.result-emphasis {
+  border: 2px solid var(--green-mid);
+  background: rgba(31, 122, 99, 0.16);
+}
+
+.is-hidden {
+  display: none;
+}
+
+.result .label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+.result strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 14px;
+  color: var(--green-dark);
+}
+
+.legend {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+  color: var(--text);
+  font-size: 10.5px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.swatch-1 {
+  background: var(--green-mid);
+}
+
+.swatch-2 {
+  background: var(--yellow);
+}
+
+.chart-wrap {
+  background: var(--white);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 6px;
+}
+
+.chart-wrap canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.notes {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text);
+}
+
+.notes li {
+  margin-bottom: 3px;
+}
+
+.checklist {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text);
+}
+
+.checklist li {
+  margin-bottom: 2px;
+  list-style: "✔ ";
+  padding-left: 5px;
+}
+
+.text-section p {
+  margin: 0 0 8px;
+  text-align: justify;
+  line-height: 1.5;
+}
+
+.text-section .checklist {
+  margin: 2px 0 8px;
+}
+
+.text-section .checklist li {
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: none;
+  padding: 7px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: var(--green-mid);
+  color: var(--white);
+}
+
+.btn-warning {
+  background: var(--yellow);
+  color: var(--green-dark);
+}
+
+.footer {
+  text-align: center;
+  color: var(--text);
+  padding: 8px 12px 12px;
+  font-size: 10.5px;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    text-align: left;
+  }
+
+  .field-group {
+    grid-column: span 1;
+  }
+
+  .field-group-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    background: #ffffff;
+  }
+
+  .hero {
+    background: var(--green-dark) !important;
+    color: var(--white) !important;
+  }
+
+  .card {
+    border: 1px solid var(--border);
+    page-break-inside: avoid;
+    padding: 8px 10px;
+  }
+
+  .hero {
+    padding: 12px 18px 8px;
+  }
+
+  .container {
+    padding: 8px 16px 10px;
+    gap: 6px;
+  }
+
+  .card h2 {
+    margin-bottom: 6px;
+    font-size: 15px;
+  }
+
+  .grid,
+  .results,
+  .field-group-grid {
+    gap: 6px;
+  }
+
+  .result {
+    padding: 7px 8px;
+  }
+
+  .legend {
+    margin-bottom: 4px;
+  }
+
+  .chart-wrap {
+    padding: 4px;
+  }
+
+  .chart-wrap canvas {
+    height: 180px !important;
+  }
+
+  .actions,
+  .toolbar {
+    display: none;
+  }
+
+  .footer {
+    padding-bottom: 0;
+  }
+
+  .config-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .field-group {
+    grid-column: span 2;
+  }
+
+  @page {
+    size: A4;
+    margin: 6mm;
+  }
+}
+
+</style>
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Simulador Financeiro</p>
+      <h1>Consórcio x À Vista</h1>
+      <p class="subtitle">Planejamento inteligente para aquisição de bens ( Por Adriano M Goulart, CEA - F0172689).</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="toolbar">
+      <button id="limparDados" type="button" class="btn btn-warning">Limpar dados</button>
+    </div>
+
+    <section class="card">
+      <h2>Dados da simulação</h2>
+      <div class="grid">
+        <label class="field">
+          <span>Nome</span>
+          <input id="nomeCliente" type="text" value="" />
+        </label>
+        <label class="field">
+          <span>Data da Simulação</span>
+          <input id="dataSimulacao" type="date" value="" />
+        </label>
+        <label class="field">
+          <span>Consultor</span>
+          <input id="consultor" type="text" value="" />
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Configurações da Simulação</h2>
+      <div class="grid config-grid">
+        <label class="field">
+          <span>Valor do Bem</span>
+          <input id="valorBem" type="text" value="" />
+        </label>
+        <label class="field">
+          <span>Prazo (meses)</span>
+          <input id="prazoMeses" type="number" step="1" value="" />
+        </label>
+        <label class="field">
+          <span>Taxa de administração %</span>
+          <input id="taxaAdm" type="number" step="0.01" value="" />
+        </label>
+        <label class="field">
+          <span>% do Lance</span>
+          <input id="percentualLance" type="number" step="0.01" value="" />
+        </label>
+        <div class="field-group">
+          <div class="field-group-grid">
+            <label class="field">
+              <span>Escolha o cenário:</span>
+              <select id="cenarioRendimento">
+                <option value="pessimista">Pessimista: 7,5% a.a.</option>
+                <option value="esperado" selected>Esperado: 9,5% a.a.</option>
+                <option value="otimista">Otimista: 12,5% a.a.</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Correção do saldo devedor</span>
+              <select id="aplicarCorrecaoSaldo">
+                <option value="nao" selected>Não aplicar</option>
+                <option value="sim">Aplicar INCC 4% a.a.</option>
+              </select>
+            </label>
+          </div>
+          <small class="hint">O cenário define a taxa mensal de cálculo e a correção do saldo devedor ativa o ajuste anual de 4% no consórcio.</small>
+        </div>
+        <label class="field">
+          <span>Aluguel mensal</span>
+          <input id="pagamentosReceitas" type="text" value="" />
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Estratégia do Consórcio:</h2>
+      <div class="results">
+        <div class="result">
+          <span class="label">Valor da Carta</span>
+          <strong id="valorCarta"></strong>
+        </div>
+        <div class="result">
+          <span class="label">Valor do Lance</span>
+          <strong id="valorLance"></strong>
+        </div>
+        <div class="result">
+          <span class="label">Diferença investida</span>
+          <strong id="diferencaInvestida"></strong>
+        </div>
+        <div class="result">
+          <span class="label">Rend. mensal esperado</span>
+          <strong id="rendimentoMensalEsperado"></strong>
+        </div>
+        <div class="result">
+          <span class="label">Parcela inicial</span>
+          <strong id="parcelaInicial"></strong>
+        </div>
+        <div class="result result-emphasis">
+          <span class="label">Parcela após o Lance</span>
+          <strong id="parcelaAposLance"></strong>
+        </div>
+        <div class="result">
+          <span class="label">Prazo</span>
+          <strong id="prazoResultado"></strong>
+        </div>
+        <div class="result">
+          <span class="label">Rendimento mensal (%)</span>
+          <strong id="rendimentoMensalPercent"></strong>
+        </div>
+        <div class="result is-hidden">
+          <span class="label">Resgate/aporte programado</span>
+          <strong id="resgateAporte"></strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Resultado patrimonial</h2>
+      <div class="results">
+        <div class="result">
+          <span class="label">Bem adquirido</span>
+          <strong id="bemAdquirido"></strong>
+        </div>
+        <div class="result">
+          <span class="label">Renda passiva projetada (aluguel + rendimento projetados)</span>
+          <strong id="rendaPassivaProjetada"></strong>
+        </div>
+        <div class="result">
+          <span class="label">Saldo final</span>
+          <strong id="saldoFinal"></strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Projeção (Planilha2)</h2>
+      <p class="subtitle">Crescimento considerando correção do imóvel em INCC de 4% aa e na evolução do saldo final do capital investido.</p>
+      <div class="legend">
+        <span class="legend-item"><i class="swatch swatch-1"></i>Compra à vista</span>
+        <span class="legend-item"><i class="swatch swatch-2"></i>Consórcio + Investimento</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="graficoProjecao" width="920" height="220" aria-label="Gráfico de projeção"></canvas>
+      </div>
+    </section>
+
+    <section class="card text-section">
+      <h2>Conclusão</h2>
+      <p>O consórcio pode ser uma alternativa estratégica para aquisição planejada de patrimônio, permitindo maior preservação de capital ao longo do prazo. Dentro do cenário simulado, a estratégia apresentada busca equilibrar aquisição patrimonial, manutenção de liquidez e potencial de crescimento financeiro ao longo do tempo.</p>
+      <p>Com essa estrutura, é possível:</p>
+      <ul class="checklist">
+        <li>Adquirir o imóvel sem a necessidade de descapitalização imediata total</li>
+        <li>Manter parte do capital aplicado durante o período do consórcio</li>
+        <li>Utilizar eventuais rendimentos financeiros e receitas de aluguel para auxiliar no fluxo das parcelas</li>
+        <li>Construir patrimônio de forma gradual, conciliando aquisição imobiliária e estratégia financeira</li>
+      </ul>
+      <p>As projeções apresentadas nesta simulação possuem caráter estimativo e foram elaboradas com base nas premissas informadas, podendo sofrer variações conforme condições de mercado, rentabilidade dos investimentos, reajustes da carta de crédito, contemplação e demais fatores econômicos.</p>
+    </section>
+
+    <section class="card notes-card text-section">
+      <h2>Notas</h2>
+      <p>Este material possui caráter exclusivamente informativo e ilustrativo, tendo como objetivo auxiliar na análise de cenários patrimoniais e financeiros relacionados à aquisição de imóveis por meio de consórcio.</p>
+      <p>As informações, projeções e estimativas apresentadas foram elaboradas com base nas premissas informadas na simulação e podem sofrer alterações em função de fatores econômicos, financeiros e de mercado, incluindo variações de rentabilidade, inflação, reajustes da carta de crédito, disponibilidade de crédito, receitas de aluguel e demais condições aplicáveis.</p>
+      <p>A rentabilidade de investimentos financeiros não é garantida, podendo apresentar oscilações ao longo do tempo. Rentabilidades passadas não representam garantia de resultados futuros.</p>
+      <p>A contemplação no consórcio depende das regras do grupo, disponibilidade do fundo comum, sorteios e oferta de lances, não havendo garantia de contemplação em prazo específico.</p>
+      <p>As premissas desta simulação fundamentam-se em dados históricos das seguintes instituições: FGV IBRE (para projeção de INCC), Banco Central do Brasil (para estimativas de CDI/Selic via Relatório Focus) e Fipe/ABECIP (para índices de valorização patrimonial). Os percentuais adotados buscam refletir a convergência das médias históricas de 10 e 18 anos, mitigando volatilidades pontuais do mercado e garantindo uma análise de viabilidade financeira conservadora e realista.</p>
+      <p>Este material não constitui promessa de rentabilidade, garantia de resultado, recomendação personalizada de investimento, assessoria financeira, jurídica ou tributária, nem oferta pública de crédito ou valores mobiliários.</p>
+    </section>
+
+    <section class="card actions">
+      <button id="exportarPdf" type="button" class="btn btn-primary">Exportar em PDF</button>
+      <span class="hint">A exportação abre a janela de impressão. Selecione “Salvar como PDF”.</span>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Simulação ilustrativa. Não constitui oferta ou garantia de rentabilidade.</p>
+  </footer>
+
+  <script>
+const brlFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const percentFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "percent",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const SCENARIO_RATES = {
+  otimista: 0.0098,
+  esperado: 0.0076,
+  pessimista: 0.006,
+};
+const ANNUAL_REAJUSTE_RATE = 0.04;
+
+const inputs = {
+  nomeCliente: document.getElementById("nomeCliente"),
+  dataSimulacao: document.getElementById("dataSimulacao"),
+  consultor: document.getElementById("consultor"),
+  valorBem: document.getElementById("valorBem"),
+  prazoMeses: document.getElementById("prazoMeses"),
+  taxaAdm: document.getElementById("taxaAdm"),
+  percentualLance: document.getElementById("percentualLance"),
+  cenarioRendimento: document.getElementById("cenarioRendimento"),
+  aplicarCorrecaoSaldo: document.getElementById("aplicarCorrecaoSaldo"),
+  pagamentosReceitas: document.getElementById("pagamentosReceitas"),
+};
+
+const outputs = {
+  valorCarta: document.getElementById("valorCarta"),
+  valorLance: document.getElementById("valorLance"),
+  parcelaAposLance: document.getElementById("parcelaAposLance"),
+  prazoResultado: document.getElementById("prazoResultado"),
+  parcelaInicial: document.getElementById("parcelaInicial"),
+  diferencaInvestida: document.getElementById("diferencaInvestida"),
+  rendimentoMensalPercent: document.getElementById("rendimentoMensalPercent"),
+  rendimentoMensalEsperado: document.getElementById("rendimentoMensalEsperado"),
+  resgateAporte: document.getElementById("resgateAporte"),
+  bemAdquirido: document.getElementById("bemAdquirido"),
+  rendaPassivaProjetada: document.getElementById("rendaPassivaProjetada"),
+  saldoFinal: document.getElementById("saldoFinal"),
+};
+
+const graficoCanvas = document.getElementById("graficoProjecao");
+const exportarPdfBtn = document.getElementById("exportarPdf");
+const limparDadosBtn = document.getElementById("limparDados");
+
+function getTaxaCenario() {
+  return SCENARIO_RATES[inputs.cenarioRendimento.value] ?? SCENARIO_RATES.esperado;
+}
+
+function deveAplicarCorrecaoSaldo() {
+  return inputs.aplicarCorrecaoSaldo.value === "sim";
+}
+
+function toNumber(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+}
+
+function parseCurrencyBr(value) {
+  if (!value) return 0;
+  const cleaned = value
+    .toString()
+    .replace(/\s/g, "")
+    .replace(/R\$/gi, "")
+    .replace(/\./g, "")
+    .replace(/,/g, ".")
+    .replace(/[^0-9.-]/g, "");
+  const num = Number(cleaned);
+  return Number.isFinite(num) ? num : 0;
+}
+
+function formatCurrency(value) {
+  return brlFormatter.format(value);
+}
+
+function formatPercent(value) {
+  return percentFormatter.format(value);
+}
+
+function formatCurrencyInput(inputEl) {
+  if (!inputEl.value || !inputEl.value.trim()) {
+    inputEl.value = "";
+    return;
+  }
+  const value = parseCurrencyBr(inputEl.value);
+  inputEl.value = formatCurrency(value);
+}
+
+// Origem: Comparativo Compra x Consórcio!B7 = E12
+function calcularValorCarta(valorBem) {
+  return valorBem;
+}
+
+// Origem: Comparativo Compra x Consórcio!J12 = E12 * (E15 / 100)
+function calcularValorLance(valorBem, percentualLance) {
+  return valorBem * (percentualLance / 100);
+}
+
+// Origem: Comparativo Compra x Consórcio!J13 = (E12 * (1 + E14/100) - J12) / E13
+function calcularParcelaAposLance(valorBem, taxaAdm, valorLance, prazoMeses) {
+  if (prazoMeses === 0) return 0;
+  return (valorBem * (1 + taxaAdm / 100) - valorLance) / prazoMeses;
+}
+
+// Origem: Comparativo Compra x Consórcio!J14 = E13
+function calcularPrazoResultado(prazoMeses) {
+  return prazoMeses;
+}
+
+// Origem: Comparativo Compra x Consórcio!E16 = E12 * (1 + E14/100) / E13
+function calcularParcelaInicial(valorBem, taxaAdm, prazoMeses) {
+  if (prazoMeses === 0) return 0;
+  return (valorBem * (1 + taxaAdm / 100)) / prazoMeses;
+}
+
+// Origem: Comparativo Compra x Consórcio!J19 = E12 - J12
+function calcularDiferencaInvestida(valorBem, valorLance) {
+  return valorBem - valorLance;
+}
+
+// Origem: Comparativo Compra x Consórcio!J20 = E17
+function calcularRendimentoMensalPercent() {
+  return getTaxaCenario();
+}
+
+// Origem: Comparativo Compra x Consórcio!J21 = J19 * E17
+function calcularRendimentoMensalEsperado(diferencaInvestida) {
+  return diferencaInvestida * getTaxaCenario();
+}
+
+// Ajuste: Resgate/aporte programado = Rend. mensal esperado + Aluguel mensal - Parcela após o Lance
+function calcularResgateAporte(rendimentoMensalEsperado, aluguelMensal, parcelaAposLance) {
+  return rendimentoMensalEsperado + aluguelMensal - parcelaAposLance;
+}
+
+function calcularParcelaMes(parcelaBase, mes) {
+  if (!deveAplicarCorrecaoSaldo()) {
+    return parcelaBase;
+  }
+  const cicloAnual = Math.floor((mes - 1) / 12);
+  return parcelaBase * Math.pow(1 + ANNUAL_REAJUSTE_RATE, cicloAnual);
+}
+
+// Saldo final: aplica rendimento mensal sobre o saldo e usa o rendimento para pagar a parcela.
+function calcularSaldoFinal(prazoMeses, aluguelMensal, parcelaAposLance, diferencaInvestida) {
+  const taxaCenario = getTaxaCenario();
+  let saldo = diferencaInvestida;
+  for (let mes = 1; mes <= prazoMeses; mes += 1) {
+    const parcelaMes = calcularParcelaMes(parcelaAposLance, mes);
+    const rendimento = saldo * taxaCenario;
+    saldo = saldo + rendimento + aluguelMensal - parcelaMes;
+  }
+  return saldo;
+}
+
+// Saldos anuais (ano 0 até o último ano), com ajuste final para saldo completo do prazo.
+function calcularSaldosAnuais(prazoMeses, aluguelMensal, parcelaAposLance, diferencaInvestida) {
+  const taxaCenario = getTaxaCenario();
+  const anos = Math.floor(prazoMeses / 12);
+  const saldos = [diferencaInvestida];
+  let saldo = diferencaInvestida;
+
+  for (let mes = 1; mes <= prazoMeses; mes += 1) {
+    const parcelaMes = calcularParcelaMes(parcelaAposLance, mes);
+    const rendimento = saldo * taxaCenario;
+    saldo = saldo + rendimento + aluguelMensal - parcelaMes;
+    if (mes % 12 === 0) {
+      saldos.push(saldo);
+    }
+  }
+
+  if (saldos.length === anos + 1) {
+    saldos[saldos.length - 1] = saldo;
+  } else {
+    while (saldos.length < anos + 1) {
+      saldos.push(saldo);
+    }
+    saldos.length = anos + 1;
+  }
+
+  return saldos;
+}
+
+
+// Requisito: Bem adquirido = Valor do Bem
+function calcularBemAdquirido(valorBem) {
+  return valorBem;
+}
+
+// Renda passiva projetada = 0,5% do valor final da linha Compra à vista + 0,7% do Saldo final
+function calcularRendaPassiva(valorFinalCompraVista, saldoFinal) {
+  return (valorFinalCompraVista * 0.005) + (saldoFinal * 0.007);
+}
+
+// Projeção anual: prazo em meses convertido para anos inteiros.
+function calcularSequenciaAnos(prazoMeses) {
+  const anos = Math.floor(prazoMeses / 12);
+  return Array.from({ length: Math.max(anos, 0) + 1 }, (_, i) => i);
+}
+
+// Linha 1: Compra à vista = Valor do Bem com crescimento anual de 4%.
+function calcularLinhaCompraVista(valorBem, anos) {
+  return anos.map((ano) => valorBem * Math.pow(1.04, ano));
+}
+
+// Linha 2: Evolução do bem + saldo final do capital investido.
+function calcularLinhaBemMaisSaldo(valorBem, anosArray, saldosAnuais) {
+  return anosArray.map((ano, index) => {
+    const bemCorrigido = valorBem * Math.pow(1.04, ano);
+    const saldo = saldosAnuais[index] ?? 0;
+    return bemCorrigido + saldo;
+  });
+}
+
+function drawProjectionChart(anos, linhaCompraVista, linhaBemMaisSaldo) {
+  const ctx = graficoCanvas.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const width = graficoCanvas.clientWidth;
+  const height = graficoCanvas.clientHeight;
+
+  graficoCanvas.width = Math.round(width * dpr);
+  graficoCanvas.height = Math.round(height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  ctx.clearRect(0, 0, width, height);
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, width, height);
+
+  if (anos.length === 0) {
+    ctx.fillStyle = "#4f4f4f";
+    ctx.font = "12px Trebuchet MS";
+    ctx.fillText("Sem projeção (prazo menor que 12 meses).", 14, height / 2);
+    return;
+  }
+
+  const padding = 40;
+  const innerWidth = width - padding * 2;
+  const innerHeight = height - padding * 2;
+  const allValues = [...linhaCompraVista, ...linhaBemMaisSaldo];
+  const minVal = Math.min(...allValues);
+  const maxVal = Math.max(...allValues);
+  const range = maxVal - minVal || 1;
+
+  ctx.strokeStyle = "#e0e0e0";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padding, padding);
+  ctx.lineTo(padding, height - padding);
+  ctx.lineTo(width - padding, height - padding);
+  ctx.stroke();
+
+  function drawLine(series, color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    series.forEach((valor, index) => {
+      const x = padding + (innerWidth * index) / (series.length - 1 || 1);
+      const y = padding + innerHeight - ((valor - minVal) / range) * innerHeight;
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    ctx.stroke();
+
+    ctx.fillStyle = color;
+    series.forEach((valor, index) => {
+      const x = padding + (innerWidth * index) / (series.length - 1 || 1);
+      const y = padding + innerHeight - ((valor - minVal) / range) * innerHeight;
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (index === 0 || index === series.length - 1) {
+        ctx.fillStyle = "#0f3d2e";
+        ctx.font = "10px Trebuchet MS";
+        ctx.fillText(formatCurrency(valor), x - 28, y - 8);
+        ctx.fillStyle = color;
+      }
+    });
+  }
+
+  drawLine(linhaCompraVista, "#1f7a63");
+  drawLine(linhaBemMaisSaldo, "#f2c94c");
+
+  // Legenda
+  ctx.fillStyle = "#1f7a63";
+  ctx.fillRect(padding - 12, padding - 16, 9, 9);
+  ctx.fillStyle = "#4f4f4f";
+  ctx.font = "10px Trebuchet MS";
+  ctx.fillText("Compra à vista", padding, padding - 8);
+
+  ctx.fillStyle = "#f2c94c";
+  ctx.fillRect(padding + 100, padding - 16, 9, 9);
+  ctx.fillStyle = "#4f4f4f";
+  ctx.fillText("Bem + saldo final", padding + 112, padding - 8);
+
+  // Eixos
+  ctx.fillStyle = "#4f4f4f";
+  ctx.font = "10px Trebuchet MS";
+  ctx.fillText("Prazo em anos", width / 2 - 30, height - 8);
+
+  ctx.save();
+  ctx.translate(12, height / 2 + 16);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText("Patrimônio $", 0, 0);
+  ctx.restore();
+}
+
+function recalculate() {
+  const valorBem = parseCurrencyBr(inputs.valorBem.value);
+  const prazoMeses = toNumber(inputs.prazoMeses.value);
+  const taxaAdm = toNumber(inputs.taxaAdm.value);
+  const percentualLance = toNumber(inputs.percentualLance.value);
+  const aluguelMensal = parseCurrencyBr(inputs.pagamentosReceitas.value);
+
+  const valorCarta = calcularValorCarta(valorBem);
+  const valorLance = calcularValorLance(valorBem, percentualLance);
+  const parcelaAposLance = calcularParcelaAposLance(valorBem, taxaAdm, valorLance, prazoMeses);
+  const prazoResultado = calcularPrazoResultado(prazoMeses);
+  const parcelaInicial = calcularParcelaInicial(valorBem, taxaAdm, prazoMeses);
+  const diferencaInvestida = calcularDiferencaInvestida(valorBem, valorLance);
+  const rendimentoMensalPercent = calcularRendimentoMensalPercent();
+  const rendimentoMensalEsperado = calcularRendimentoMensalEsperado(diferencaInvestida);
+  const resgateAporte = calcularResgateAporte(rendimentoMensalEsperado, aluguelMensal, parcelaAposLance);
+  const saldoFinal = calcularSaldoFinal(prazoMeses, aluguelMensal, parcelaAposLance, diferencaInvestida);
+  const bemAdquirido = calcularBemAdquirido(valorBem);
+
+  const anos = calcularSequenciaAnos(prazoMeses);
+  const saldosAnuais = calcularSaldosAnuais(prazoMeses, aluguelMensal, parcelaAposLance, diferencaInvestida);
+  const linhaCompraVista = calcularLinhaCompraVista(valorBem, anos);
+  const linhaBemMaisSaldo = calcularLinhaBemMaisSaldo(valorBem, anos, saldosAnuais);
+
+  const valorFinalCompraVista = linhaCompraVista.length > 0 ? linhaCompraVista[linhaCompraVista.length - 1] : valorBem;
+  const rendaPassiva = calcularRendaPassiva(valorFinalCompraVista, saldoFinal);
+
+  outputs.valorCarta.textContent = formatCurrency(valorCarta);
+  outputs.valorLance.textContent = formatCurrency(valorLance);
+  outputs.parcelaAposLance.textContent = formatCurrency(parcelaAposLance);
+  outputs.prazoResultado.textContent = `${prazoResultado} meses`;
+  outputs.parcelaInicial.textContent = formatCurrency(parcelaInicial);
+  outputs.diferencaInvestida.textContent = formatCurrency(diferencaInvestida);
+  outputs.rendimentoMensalPercent.textContent = formatPercent(rendimentoMensalPercent);
+  outputs.rendimentoMensalEsperado.textContent = formatCurrency(rendimentoMensalEsperado);
+  outputs.resgateAporte.textContent = formatCurrency(resgateAporte);
+  outputs.saldoFinal.textContent = formatCurrency(saldoFinal);
+  outputs.bemAdquirido.textContent = formatCurrency(bemAdquirido);
+  outputs.rendaPassivaProjetada.textContent = formatCurrency(rendaPassiva);
+
+  drawProjectionChart(anos, linhaCompraVista, linhaBemMaisSaldo);
+}
+
+[
+  inputs.valorBem,
+  inputs.prazoMeses,
+  inputs.taxaAdm,
+  inputs.percentualLance,
+  inputs.pagamentosReceitas,
+].forEach((input) => {
+  input.addEventListener("input", recalculate);
+});
+
+[
+  inputs.nomeCliente,
+  inputs.dataSimulacao,
+  inputs.consultor,
+  inputs.cenarioRendimento,
+  inputs.aplicarCorrecaoSaldo,
+].forEach((input) => {
+  input.addEventListener("change", recalculate);
+});
+
+[inputs.valorBem, inputs.pagamentosReceitas].forEach((input) => {
+  input.addEventListener("blur", () => formatCurrencyInput(input));
+});
+
+exportarPdfBtn.addEventListener("click", () => {
+  window.print();
+});
+
+limparDadosBtn.addEventListener("click", () => {
+  Object.values(inputs).forEach((input) => {
+    if (input === inputs.cenarioRendimento) {
+      input.value = "esperado";
+      return;
+    }
+    if (input === inputs.aplicarCorrecaoSaldo) {
+      input.value = "nao";
+      return;
+    }
+    input.value = "";
+  });
+  recalculate();
+});
+
+window.addEventListener("resize", recalculate);
+
+recalculate();
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
 
