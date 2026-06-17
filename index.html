@@ -200,7 +200,7 @@ main > .section:first-child {
 
 .solutions-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 }
 
@@ -244,6 +244,35 @@ main > .section:first-child {
 .solution-card .button {
   width: 100%;
   margin-top: auto;
+}
+
+.new-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 18px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: var(--forest-strong);
+  background: var(--gold);
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  animation: blinkBadge 1s ease-in-out infinite;
+}
+
+@keyframes blinkBadge {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(245, 255, 0, 0.45);
+  }
+
+  50% {
+    opacity: 0.42;
+    box-shadow: 0 0 0 5px rgba(245, 255, 0, 0);
+  }
 }
 
 .differentials {
@@ -607,6 +636,15 @@ body.simulator-mode .simulator-frame {
           </p>
           <a class="button button-primary" href="#simulador" data-simulator="lance">Calcular Lance</a>
         </article>
+
+        <article class="solution-card">
+          <div class="solution-icon" aria-hidden="true">💬</div>
+          <h3>Oferta Montada</h3>
+          <p>
+            Abordagem ao público do Rel 2795, Cashback e Consórcio Amigo com mensagem pronta e QR Code para WhatsApp.
+          </p>
+          <a class="button button-primary" href="#simulador" data-simulator="oferta">Montar Oferta <span class="new-badge">novo</span></a>
+        </article>
       </div>
     </section>
 
@@ -693,7 +731,12 @@ body.simulator-mode .simulator-frame {
   const simulatorTitles = {
     veiculo: "VEÍCULO - Financiamento X Consórcio",
     imovel: "IMÓVEL - À Vista x Consórcio",
-    lance: "Simulador - Lance Embutido"
+    lance: "Simulador - Lance Embutido",
+    oferta: "Oferta Montada"
+  };
+
+  const simulatorUrls = {
+    oferta: "oferta-montada.html"
   };
 
   const shell = document.getElementById("simulador");
@@ -720,6 +763,7 @@ body.simulator-mode .simulator-frame {
 
   function clearFrameContent() {
     frame.removeAttribute("srcdoc");
+    frame.removeAttribute("src");
   }
 
   function closeSimulator(restoreScroll = true) {
@@ -734,11 +778,16 @@ body.simulator-mode .simulator-frame {
   }
 
   function openSimulator(key, addHistory = true) {
-    if (!simulatorHtml[key]) return;
+    if (!simulatorHtml[key] && !simulatorUrls[key]) return;
     activeSimulator = key;
     title.textContent = simulatorTitles[key] || "Simulador";
 
-    frame.srcdoc = decodeHtml(simulatorHtml[key]);
+    clearFrameContent();
+    if (simulatorHtml[key]) {
+      frame.srcdoc = decodeHtml(simulatorHtml[key]);
+    } else {
+      frame.src = simulatorUrls[key];
+    }
     document.body.classList.add("simulator-mode");
     shell.classList.add("is-open");
 
