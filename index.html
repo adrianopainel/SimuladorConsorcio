@@ -47,7 +47,6 @@ a {
   right: 0;
   left: 0;
   background: var(--forest);
-  border-bottom: 5px solid var(--gold);
   color: var(--white);
 }
 
@@ -176,6 +175,10 @@ p {
   padding: 48px 0 0;
 }
 
+.section-intro {
+  position: relative;
+}
+
 main > .section:first-child {
   padding-top: 40px;
 }
@@ -196,6 +199,43 @@ main > .section:first-child {
   color: var(--muted);
   font-size: 13.5px;
   line-height: 1.45;
+}
+
+.home-alert-note {
+  position: absolute;
+  top: 12px;
+  right: 0;
+  width: min(292px, 30vw);
+  min-height: 132px;
+  padding: 18px 18px 16px;
+  transform: rotate(1.2deg);
+  border: 1px solid rgba(188, 156, 24, 0.35);
+  border-radius: 3px;
+  color: #28312e;
+  background: #fff27a;
+  box-shadow: 0 16px 28px rgba(80, 65, 12, 0.16);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.home-alert-note::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 86px;
+  height: 22px;
+  transform: translateX(-50%) rotate(-1deg);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.56);
+  box-shadow: 0 2px 7px rgba(80, 65, 12, 0.1);
+}
+
+.home-alert-note .attention {
+  display: inline-block;
+  margin-right: 5px;
+  color: #7a4d00;
 }
 
 .solutions-grid {
@@ -548,6 +588,16 @@ body.simulator-mode .simulator-frame {
     padding-top: 44px;
   }
 
+  .home-alert-note {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 100%;
+    min-height: 0;
+    margin-bottom: 22px;
+    transform: rotate(0deg);
+  }
+
   .solution-card {
     min-height: 0;
     padding: 18px;
@@ -601,7 +651,12 @@ body.simulator-mode .simulator-frame {
   </header>
 
   <main id="top">
-    <section class="section" id="simuladores">
+    <section class="section section-intro" id="simuladores">
+      <aside class="home-alert-note" aria-label="Aviso sobre independência da ferramenta">
+        <span class="attention" aria-hidden="true">⚠</span>
+        Esta é uma ferramenta independente de apoio à decisão. Não é oficial de administradoras de consórcio.
+      </aside>
+
       <div class="section-heading">
         <h2>Soluções para comparar, decidir e agir com clareza</h2>
         <p>
