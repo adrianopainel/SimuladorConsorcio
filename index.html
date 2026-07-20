@@ -245,6 +245,7 @@ main > .section:first-child {
 }
 
 .solution-card {
+  position: relative;
   min-height: 238px;
   display: flex;
   flex-direction: column;
@@ -253,6 +254,60 @@ main > .section:first-child {
   border: 1px solid var(--line);
   background: linear-gradient(180deg, #eef7f3 0%, #f7fbf9 100%);
   box-shadow: 0 10px 24px rgba(36, 49, 46, 0.07);
+  overflow: hidden;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.solution-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(31, 122, 99, 0.4);
+  box-shadow: 0 16px 34px rgba(8, 40, 31, 0.14);
+}
+
+/* Marca d'água: canto superior direito, atrás do conteúdo */
+.solution-card .watermark {
+  position: absolute;
+  top: -18px;
+  right: -22px;
+  z-index: 0;
+  width: 152px;
+  height: 152px;
+  color: var(--forest);
+  opacity: 0.075;
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.solution-card:hover .watermark {
+  opacity: 0.11;
+  transform: scale(1.05) rotate(-2deg);
+}
+
+.solution-card .watermark svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke-width: 2.8;
+}
+
+/* Fio superior colorido separando as famílias de ferramentas */
+.solution-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--teal);
+  opacity: 0.85;
+}
+
+.solution-card.family-imovel::before { background: var(--forest); }
+.solution-card.family-tools::before { background: #c9a227; }
+
+.solution-card > *:not(.watermark) {
+  position: relative;
+  z-index: 2;
 }
 
 .solution-icon {
@@ -674,6 +729,174 @@ body.simulator-mode .simulator-frame {
 @media (max-width: 980px) {
   .news-card { grid-column: 1 / -1; }
 }
+
+/* ===== Microinterações ===== */
+
+/* 1. Entrada suave dos cards ao carregar a página (escalonada) */
+@keyframes cardEnter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.solutions-grid > * {
+  animation: cardEnter 520ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+.solutions-grid > *:nth-child(1) { animation-delay: 40ms; }
+.solutions-grid > *:nth-child(2) { animation-delay: 110ms; }
+.solutions-grid > *:nth-child(3) { animation-delay: 180ms; }
+.solutions-grid > *:nth-child(4) { animation-delay: 250ms; }
+.solutions-grid > *:nth-child(5) { animation-delay: 320ms; }
+.solutions-grid > *:nth-child(6) { animation-delay: 390ms; }
+
+/* 2. Brilho que percorre o botão ao passar o mouse no card */
+.solution-card .button-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.solution-card .button-primary::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: skewX(-18deg);
+  transition: left 620ms ease;
+}
+
+.solution-card:hover .button-primary::after {
+  left: 130%;
+}
+
+/* 3. Card inteiro reage ao hover do botão (feedback antecipado) */
+.solution-card .button-primary:hover {
+  box-shadow: 0 10px 22px rgba(6, 72, 62, 0.32);
+}
+
+/* 4. Itens de diferenciais sobem discretamente */
+.differential {
+  transition: transform 200ms ease, color 200ms ease;
+}
+
+.differential:hover {
+  transform: translateY(-3px);
+  color: var(--teal);
+}
+
+/* 5. Contatos do topo com realce suave */
+.contact-list a,
+.contact-list-light a {
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.contact-list a:hover,
+.contact-list-light a:hover {
+  transform: translateY(-2px);
+}
+
+/* 6. Card de novidades: entrada e leve realce da borda */
+.news-card {
+  transition: box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.news-card:hover {
+  border-color: rgba(31, 122, 99, 0.5);
+  box-shadow: 0 16px 32px rgba(8, 40, 31, 0.13);
+}
+
+/* 7. Foguete das novidades com flutuação sutil */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+.news-card .news-head > .news-rocket:not(.is-launching) {
+  display: inline-block;
+  animation: floatY 2.8s ease-in-out infinite;
+}
+
+/* 8. Respeita quem prefere menos movimento (acessibilidade) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ===== Easter eggs ===== */
+.news-rocket {
+  display: inline-block;
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+
+.news-rocket:hover { transform: scale(1.15) rotate(-8deg); }
+
+.news-rocket.is-launching {
+  animation: rocketLaunch 1500ms cubic-bezier(0.35, 0, 0.6, 1) forwards;
+}
+
+@keyframes rocketLaunch {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+  12%  { transform: translate(-3px, 5px) rotate(-8deg) scale(0.9); }
+  22%  { transform: translate(3px, 4px) rotate(6deg) scale(0.92); }
+  55%  { transform: translate(60px, -170px) rotate(18deg) scale(1.1); opacity: 1; }
+  75%  { transform: translate(110px, -330px) rotate(24deg) scale(0.7); opacity: 0.5; }
+  100% { transform: translate(150px, -460px) rotate(28deg) scale(0.3); opacity: 0; }
+}
+
+.rocket-trail {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f9d976 0%, rgba(249, 154, 39, 0.55) 55%, rgba(249, 154, 39, 0) 100%);
+  pointer-events: none;
+  z-index: 30;
+  animation: trailFade 850ms ease-out forwards;
+}
+
+@keyframes trailFade {
+  from { opacity: 0.85; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.25) translateY(14px); }
+}
+
+.brand { cursor: pointer; }
+
+.brand-egg {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%) translateY(24px);
+  max-width: min(560px, calc(100% - 32px));
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 255, 0, 0.35);
+  background: var(--forest);
+  color: var(--white);
+  box-shadow: 0 22px 48px rgba(6, 40, 32, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease, transform 320ms ease;
+}
+
+.brand-egg.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.brand-egg p { margin: 0; font-size: 13.5px; line-height: 1.55; }
+.brand-egg .egg-title { margin-bottom: 6px; color: var(--gold); font-weight: 800; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; }
+.brand-egg .egg-close { position: absolute; top: 8px; right: 12px; border: 0; background: none; color: rgba(255,255,255,0.65); font-size: 17px; cursor: pointer; line-height: 1; }
+.brand-egg .egg-close:hover { color: var(--white); }
   </style>
 </head>
 <body>
@@ -718,7 +941,7 @@ body.simulator-mode .simulator-frame {
       </div>
 
       <div class="solutions-grid">
-        <article class="solution-card">
+        <article class="solution-card"><span class="watermark" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 62V52c0-2.4 1.6-4.5 3.9-5.2l11.4-3.4 7.6-8.6A6 6 0 0 1 41.4 33h17.2a6 6 0 0 1 4.5 2l7.6 8.4 11.4 3.4A5.4 5.4 0 0 1 86 52v10"/><path d="M32 44.5h36"/><path d="M50 34v10"/><circle cx="31" cy="62" r="7.5"/><circle cx="69" cy="62" r="7.5"/><path d="M14 62h9.5M38.5 62h23M76.5 62H86"/><path d="M10 72h80"/></svg></span>
           <div class="solution-icon" aria-hidden="true">🚗</div>
           <h3>VEÍCULO - Financiamento X Consórcio</h3>
           <p>
@@ -727,7 +950,7 @@ body.simulator-mode .simulator-frame {
           <a class="button button-primary" href="#simulador" data-simulator="veiculo">Iniciar Análise</a>
         </article>
 
-        <article class="solution-card">
+        <article class="solution-card family-imovel"><span class="watermark" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 48 50 24l30 24M28 44v32h44V44M44 76V58h12v18"/></svg></span>
           <div class="solution-icon" aria-hidden="true">🏠</div>
           <h3>IMÓVEL - À Vista x Consórcio</h3>
           <p>
@@ -736,7 +959,7 @@ body.simulator-mode .simulator-frame {
           <a class="button button-primary" href="#simulador" data-simulator="imovel">Analisar Estratégia</a>
         </article>
 
-        <article class="solution-card">
+        <article class="solution-card family-tools"><span class="watermark" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 78V44M40 78V30M58 78V52M76 78V22M16 84h68"/></svg></span>
           <div class="solution-icon" aria-hidden="true">📈</div>
           <h3>Simulador - Lance Embutido</h3>
           <p>
@@ -745,7 +968,7 @@ body.simulator-mode .simulator-frame {
           <a class="button button-primary" href="#simulador" data-simulator="lance">Calcular Lance</a>
         </article>
 
-        <article class="solution-card">
+        <article class="solution-card family-tools"><span class="watermark" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 30h56v34H44L30 76V64h-8z"/><path d="M36 42h28M36 52h18"/></svg></span>
           <div class="solution-icon" aria-hidden="true">💬</div>
           <h3>Oferta Montada</h3>
           <p>
@@ -754,7 +977,7 @@ body.simulator-mode .simulator-frame {
           <a class="button button-primary" href="#simulador" data-simulator="oferta">Montar Oferta <span class="new-badge">novo</span></a>
         </article>
 
-        <article class="solution-card">
+        <article class="solution-card family-imovel"><span class="watermark" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 48 50 24l30 24M28 44v32h44V44M44 76V58h12v18"/></svg></span>
           <div class="solution-icon" aria-hidden="true">🏦</div>
           <h3>IMÓVEL - Financiamento x Consórcio</h3>
           <p>
@@ -765,7 +988,7 @@ body.simulator-mode .simulator-frame {
 
         <aside class="news-card" aria-label="Novidades no sistema">
           <div class="news-head">
-            <span aria-hidden="true">🚀</span>
+            <span class="news-rocket" id="newsRocket" role="button" tabindex="0" aria-label="Foguete">🚀</span>
             <h3>Novidades no Sistema</h3>
             <span class="news-date">Atualização 19/07</span>
           </div>
@@ -842,6 +1065,12 @@ body.simulator-mode .simulator-frame {
       </div>
     </section>
   </main>
+
+  <div class="brand-egg" id="brandEgg" role="status" aria-live="polite">
+    <button class="egg-close" type="button" id="brandEggClose" aria-label="Fechar">×</button>
+    <p class="egg-title">Você encontrou um easter egg 🎉</p>
+    <p id="brandEggText"></p>
+  </div>
 
   <footer class="footer">
     <div class="footer-inner">
@@ -971,6 +1200,104 @@ body.simulator-mode .simulator-frame {
       closeSimulator();
     }
   });
+
+  /* ===== Easter eggs ===== */
+
+  // 1) Foguete das novidades: clique faz decolar com rastro de fagulhas.
+  const rocket = document.getElementById("newsRocket");
+  if (rocket) {
+    const lancarFoguete = () => {
+      if (rocket.classList.contains("is-launching")) return;
+      const inicio = rocket.getBoundingClientRect();
+      rocket.classList.add("is-launching");
+
+      let passo = 0;
+      const rastro = setInterval(() => {
+        passo += 1;
+        const atual = rocket.getBoundingClientRect();
+        const fagulha = document.createElement("span");
+        fagulha.className = "rocket-trail";
+        fagulha.style.left = `${atual.left + window.scrollX + 6 + (Math.random() * 8 - 4)}px`;
+        fagulha.style.top = `${atual.top + window.scrollY + 14}px`;
+        document.body.appendChild(fagulha);
+        setTimeout(() => fagulha.remove(), 900);
+        if (passo > 22) clearInterval(rastro);
+      }, 45);
+
+      setTimeout(() => {
+        clearInterval(rastro);
+        rocket.classList.remove("is-launching");
+        rocket.style.transform = "";
+        void inicio;
+      }, 1550);
+    };
+
+    rocket.addEventListener("click", lancarFoguete);
+    rocket.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        lancarFoguete();
+      }
+    });
+  }
+
+  // 2) Sete cliques na marca revelam um recado pessoal.
+  const brand = document.querySelector(".brand");
+  const brandEgg = document.getElementById("brandEgg");
+  const brandEggText = document.getElementById("brandEggText");
+  const brandEggClose = document.getElementById("brandEggClose");
+
+  if (brand && brandEgg && brandEggText) {
+    const recados = [
+      "Criei este hub porque cansei de ver decisões de centenas de milhares de reais sendo tomadas no achismo. Número bom não é o que convence — é o que se sustenta quando alguém confere a conta.",
+      "Consórcio não é para todo mundo, e financiamento também não. O que é para todo mundo é entender o custo antes de assinar.",
+      "O sistema de consórcio nasceu no Brasil, nos anos 1960, criado por funcionários do Banco do Brasil que se juntaram para comprar carro sem pagar juros. Sessenta anos depois, a lógica continua a mesma.",
+      "Toda simulação aqui pode ser conferida linha por linha. Se algum número não bater com o do banco ou da administradora, me avise — eu prefiro corrigir a convencer.",
+    ];
+
+    let cliques = 0;
+    let temporizador = null;
+    let esconder = null;
+
+    brand.addEventListener("click", (event) => {
+      cliques += 1;
+      clearTimeout(temporizador);
+      temporizador = setTimeout(() => { cliques = 0; }, 1200);
+
+      if (cliques >= 7) {
+        event.preventDefault();
+        cliques = 0;
+        brandEggText.textContent = recados[Math.floor(Math.random() * recados.length)];
+        brandEgg.classList.add("is-visible");
+        clearTimeout(esconder);
+        esconder = setTimeout(() => brandEgg.classList.remove("is-visible"), 14000);
+      }
+    });
+
+    if (brandEggClose) {
+      brandEggClose.addEventListener("click", () => {
+        clearTimeout(esconder);
+        brandEgg.classList.remove("is-visible");
+      });
+    }
+  }
+
+  // 3) Recado para quem abre o console do navegador.
+  try {
+    const estiloTitulo = "color:#f5ff00;background:#06483e;padding:10px 14px;border-radius:6px;font-size:13px;font-weight:bold;font-family:monospace;";
+    const estiloTexto = "color:#06483e;font-size:12.5px;line-height:1.6;font-family:Trebuchet MS,sans-serif;";
+    console.log("%c HUB DE CONSÓRCIOS AMG \n Decisões com método. ", estiloTitulo);
+    console.log(
+      "%cCurioso? Gente que olha o que tem por trás dos números costuma se dar bem com consórcio.\n\n" +
+      "Este hub é feito à mão: cálculo aberto, sem caixa-preta e sem promessa de rentabilidade.\n" +
+      "Achou algum número que não bate? Fale comigo — eu prefiro corrigir a convencer.\n\n" +
+      "Adriano M. Goulart · CEA F0172689 · Especialista em Estratégias Patrimoniais",
+      estiloTexto
+    );
+  } catch (erro) {
+    /* console indisponível: segue o jogo */
+  }
+
 })();
   </script>
 
