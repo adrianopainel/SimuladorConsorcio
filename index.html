@@ -746,8 +746,51 @@ body.simulator-mode .simulator-frame {
     right: auto;
     width: calc(100% - 10px);
     min-height: 0;
-    margin: 6px auto 24px;
+    margin: 4px auto 14px;
+    padding: 11px 13px 10px;
     transform: rotate(-1.4deg);
+  }
+
+  .home-alert-note::before {
+    top: -9px;
+    width: 74px;
+    height: 18px;
+  }
+
+  .home-alert-note .note-title {
+    margin-bottom: 5px;
+    font-size: 13px;
+  }
+
+  .home-alert-note .note-date {
+    font-size: 9.5px;
+    padding: 1px 6px;
+  }
+
+  .home-alert-note .note-list {
+    font-size: 11.8px;
+    gap: 2px;
+    padding-left: 15px;
+  }
+
+  .home-alert-note .note-link {
+    margin-top: 6px;
+    font-size: 11.5px;
+  }
+
+  /* título da seção mais compacto para os atalhos subirem */
+  .section-heading h2 {
+    font-size: 19px;
+    line-height: 1.2;
+  }
+
+  .section-heading p {
+    font-size: 12.5px;
+    margin-top: 4px;
+  }
+
+  main > .section:first-child {
+    padding-top: 16px;
   }
 
   .solution-card {
