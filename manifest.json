@@ -1,6 +1,6 @@
 {
   "name": "Hub de Consórcios AMG",
-  "short_name": "Hub AMG",
+  "short_name": "Hub Consórcios",
   "description": "Simuladores de consórcio, financiamento e estratégias patrimoniais.",
   "start_url": "./",
   "scope": "./",
