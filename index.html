@@ -1161,6 +1161,16 @@ body.simulator-mode .simulator-frame {
 }
 
 .install-fab.is-visible { display: inline-flex; }
+
+.install-fab.is-leaving {
+  animation: fabOut 420ms cubic-bezier(0.4, 0, 0.7, 0.2) both;
+  pointer-events: none;
+}
+
+@keyframes fabOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(18px) scale(0.9); }
+}
 .install-fab:hover { transform: translateY(-2px); }
 .install-fab svg { width: 17px; height: 17px; flex: none; }
 
@@ -1961,12 +1971,27 @@ body.simulator-mode .simulator-frame {
 
     const fecharFolha = () => sheet.classList.remove("is-open");
 
+    // O botão flutuante aparece, chama a atenção e se retira depois de 6 segundos.
+    let temporizadorSaida = null;
+
+    const mostrarFabTemporario = () => {
+      clearTimeout(temporizadorSaida);
+      fab.classList.remove("is-leaving");
+      fab.classList.add("is-visible");
+      temporizadorSaida = setTimeout(() => {
+        fab.classList.add("is-leaving");
+        setTimeout(() => {
+          fab.classList.remove("is-visible", "is-leaving");
+        }, 430);
+      }, 6000);
+    };
+
     // Chrome/Edge/Android: instalação nativa em um toque
     window.addEventListener("beforeinstallprompt", (evento) => {
       evento.preventDefault();
       promptAdiado = evento;
       fabLabel.textContent = "Instalar app";
-      fab.classList.add("is-visible");
+      mostrarFabTemporario();
     });
 
     fab.addEventListener("click", async () => {
@@ -1989,15 +2014,16 @@ body.simulator-mode .simulator-frame {
     });
 
     window.addEventListener("appinstalled", () => {
-      fab.classList.remove("is-visible");
+      clearTimeout(temporizadorSaida);
+      fab.classList.remove("is-visible", "is-leaving");
       promptAdiado = null;
     });
 
     // Sem beforeinstallprompt (iOS/Safari e afins): mostra o botão com instruções
     setTimeout(() => {
-      if (!promptAdiado && !jaInstalado) {
+      if (!promptAdiado && !jaInstalado && !fab.classList.contains("is-visible")) {
         fabLabel.textContent = ios ? "Adicionar à tela de início" : "Instalar app";
-        fab.classList.add("is-visible");
+        mostrarFabTemporario();
       }
     }, 1800);
   })();
