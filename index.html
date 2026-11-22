@@ -1694,6 +1694,158 @@ input:focus-visible,
     animation: none;
   }
 }
+
+/* ===== Decoracao sazonal de Natal =====
+   Montada por JS apenas dentro da janela de datas. Fora dela, nada e inserido
+   na pagina. Some no modo simulador, na impressao e com movimento reduzido. */
+
+.natal-neve {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  display: none;
+  pointer-events: none;
+}
+
+body.natal-on .natal-neve { display: block; }
+body.simulator-mode .natal-neve { display: none; }
+
+/* Fio de lampadas pendurado na borda inferior do cabecalho.
+   Caixa de altura zero, em fluxo e com posicionamento proprio: o cabecalho
+   deixa de ser sticky abaixo de 700px, entao nao serve de referencia. */
+.natal-luzes {
+  position: relative;
+  z-index: 21;
+  height: 0;
+  display: none;
+  pointer-events: none;
+}
+
+body.natal-on .natal-luzes { display: block; }
+
+.natal-fio {
+  position: absolute;
+  top: -1px;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.natal-lamp {
+  position: absolute;
+  top: 1px;
+  width: 9px;
+  height: 13px;
+  margin-left: -4.5px;
+  border-radius: 50% 50% 46% 46% / 36% 36% 64% 64%;
+  background: var(--lamp);
+  box-shadow: 0 0 8px 1px var(--lamp);
+  transform-origin: 50% 0;
+  pointer-events: auto;
+  cursor: pointer;
+  animation: natalBrilho 2600ms var(--ease-in-out) infinite;
+  animation-delay: var(--atraso);
+}
+
+.natal-lamp::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 5px;
+  height: 4px;
+  margin-left: -2.5px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+@keyframes natalBrilho {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* Clique na lampada: estouro de brilho que se propaga para as vizinhas */
+.natal-lamp.is-pulso {
+  animation: natalEstouro 520ms var(--ease-out);
+}
+
+@keyframes natalEstouro {
+  0% { opacity: 1; transform: scale(1); }
+  32% { opacity: 1; transform: scale(1.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Botao para desligar a decoracao. Vai a esquerda para nao brigar com o
+   botao de instalar o app, que fica fixo a direita. */
+.natal-switch {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 18;
+  width: 44px;
+  height: 44px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--teal);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(8, 40, 31, 0.16);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: transform var(--t-rapido) var(--ease-out),
+              box-shadow var(--t-rapido) var(--ease-out),
+              color var(--t-rapido) var(--ease-out);
+}
+
+body.natal-disponivel .natal-switch { display: flex; }
+body.simulator-mode .natal-switch { display: none; }
+
+.natal-switch:active { transform: scale(0.94); }
+
+.natal-switch[aria-pressed="false"] {
+  color: #9aa8a3;
+  box-shadow: 0 6px 16px rgba(8, 40, 31, 0.1);
+}
+
+.natal-switch:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .natal-switch:hover { box-shadow: 0 14px 30px rgba(8, 40, 31, 0.24); }
+}
+
+@media (max-width: 640px) {
+  .natal-lamp { width: 8px; height: 11px; margin-left: -4px; }
+}
+
+/* Abaixo de 700px o cabecalho e estatico e por isso ignora o proprio z-index,
+   o que deixaria a neve passar por cima dele. Relative nao desloca nada e
+   devolve o empilhamento, mantendo a neve sempre atras do cabecalho. */
+@media (max-width: 700px) {
+  body.natal-on .site-header { position: relative; }
+}
+
+/* Movimento reduzido: as luzes ficam acesas e paradas, a neve nao roda. */
+@media (prefers-reduced-motion: reduce) {
+  body.natal-on .natal-neve { display: none; }
+  .natal-lamp { animation: none; opacity: 0.92; }
+  .natal-lamp.is-pulso { animation: none; }
+}
+
+@media print {
+  .natal-neve,
+  .natal-luzes,
+  .natal-switch { display: none !important; }
+}
 </style>
 </head>
 <body>
@@ -1745,10 +1897,6 @@ input:focus-visible,
           <li><span class="note-dia">21/11</span> <span>Formulários padronizados e revisão visual</span></li>
           <li><span class="note-dia">21/11</span> <span>Melhorias de uso no celular</span></li>
           <li><span class="note-dia">21/11</span> <span>Nova ferramenta: Lance Redução do prazo</span></li>
-          <li><span class="note-dia">24/08</span> <span>Ajustes de Compliance e Disclaimers</span></li>
-          <li><span class="note-dia">13/08</span> <span>Nova análise de lances do grupo <span class="note-beta">beta</span></span></li>
-          <li><span class="note-dia">11/08</span> <span>Disponibilizada ferramenta Otimizador de Carta</span></li>
-          <li><span class="note-dia">08/11</span> <span>Liberada versão Mobile</span></li>
         </ul>
         <a class="note-link" href="#novidades" id="noteNewsLink">Ver detalhes →</a>
       </aside>
@@ -1821,7 +1969,7 @@ input:focus-visible,
           <p>
             Encontre e compare a melhor estratégia de carta para sua operação.
           </p>
-          <a class="button button-primary" href="#simulador" data-simulator="otimizador">Simular <span class="new-badge">novo</span></a>
+          <a class="button button-primary" href="#simulador" data-simulator="otimizador">Simular</a>
         </article>
 
         <article class="solution-card card-probabilidade"><span class="watermark" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 78h76"/><path d="M18 78c6-34 14-46 22-46s10 12 16 26 10 20 16 20"/><rect x="26" y="60" width="9" height="18"/><rect x="42" y="46" width="9" height="32"/><rect x="58" y="54" width="9" height="24"/></svg></span>
@@ -1845,14 +1993,14 @@ input:focus-visible,
             <li><strong>Formulários padronizados (21/11):</strong> as ferramentas passaram a seguir a mesma sequência de preenchimento, com blocos numerados, títulos uniformes e o percentual sempre antes do valor em reais. Os campos calculados pelo sistema ganharam identificação própria, os rótulos ficaram mais legíveis e os campos, mais espaçosos, com indicação clara de qual está selecionado.</li>
             <li><strong>Melhorias de uso no celular (21/11):</strong> revisão de interação em todas as ferramentas. Os campos ficaram maiores no celular e não provocam mais o zoom automático ao serem tocados, os botões respondem ao toque, o realce azul do navegador saiu e o conteúdo respeita os recortes da tela no modo aplicativo. As animações foram reduzidas e seguem a preferência de movimento do sistema.</li>
             <li><strong>Lance: Redução do prazo (21/11):</strong> nova ferramenta que compara as duas formas de aplicar o mesmo lance previstas no regulamento: encurtar o plano mantendo a mensalidade, ou manter o prazo e reduzir a parcela. Funciona também para cotas já em andamento, considerando as parcelas pagas e o reajuste anual do crédito.</li>
-            <li><strong>Revisão de compliance (24/08):</strong> textos, premissas e critérios de comparação dos simuladores foram revisados para adequação à Lei 11.795/2008 (Lei do Consórcio), às normas do Banco Central sobre informação e publicidade, ao Código de Defesa do Consumidor e ao Código de Ética da ABAC.</li>
-            <li><strong>Análise de Lances do Grupo (13/08) <span class="news-beta">beta</span>:</strong> nova ferramenta que analisa o histórico de lances e as vendas recentes do grupo para projetar o comportamento da próxima assembleia. Em fase de testes, ainda sem uso comercial.</li>
-            <li><strong>Otimizador de Carta (11/08):</strong> encontre e compare a melhor estratégia de carta para cada operação, com a comparação lado a lado das alternativas.</li>
-            <li><strong>App para celular (06/08):</strong> o hub pode ser instalado na tela de início do celular e abre em tela cheia, como um aplicativo. Use o botão "Instalar app" no topo: no computador, ele exibe um QR Code.</li>
         </ul>
         <details class="news-old">
           <summary>Ver atualizações anteriores</summary>
           <ul>
+            <li><strong>Revisão de compliance (24/08):</strong> textos, premissas e critérios de comparação dos simuladores foram revisados para adequação à Lei 11.795/2008 (Lei do Consórcio), às normas do Banco Central sobre informação e publicidade, ao Código de Defesa do Consumidor e ao Código de Ética da ABAC.</li>
+            <li><strong>Análise de Lances do Grupo (13/08) <span class="news-beta">beta</span>:</strong> nova ferramenta que analisa o histórico de lances e as vendas recentes do grupo para projetar o comportamento da próxima assembleia. Em fase de testes, ainda sem uso comercial.</li>
+            <li><strong>Otimizador de Carta (11/08):</strong> encontre e compare a melhor estratégia de carta para cada operação, com a comparação lado a lado das alternativas.</li>
+            <li><strong>App para celular (06/08):</strong> o hub pode ser instalado na tela de início do celular e abre em tela cheia, como um aplicativo. Use o botão "Instalar app" no topo: no computador, ele exibe um QR Code.</li>
             <li><strong>Navegação otimizada no celular (06/08):</strong> os simuladores viraram atalhos em grade, com todas as ferramentas visíveis em uma só tela.</li>
             <li><strong>Comparador aprimorado (06/08):</strong> colunas identificadas por modalidade, IOF calculado automaticamente, opção de incluir a TR e impressão em duas colunas.</li>
             <li><strong>Novo Comparador (19/07):</strong> lançamento da ferramenta de comparação entre Financiamento Imobiliário e Consórcio, facilitando a visualização e a argumentação de vendas.</li>
@@ -2995,6 +3143,289 @@ function qrSvg(text) {
   })();
 
 })();
+
+  /* ===== Decoracao sazonal de Natal =====
+     Neve em canvas que desvia do cursor e se espalha ao clique, mais um fio de
+     lampadas no cabecalho que acende em onda quando a pessoa toca numa delas.
+     Nada e inserido na pagina fora da janela de datas. */
+  (function natalAMG() {
+    "use strict";
+
+    // Estreia em 21/11/2026; nos anos seguintes entra em 1/12. Sempre sai em 6/1.
+    function dentroDaJanela(hoje) {
+      const ano = hoje.getFullYear();
+      const mes = hoje.getMonth() + 1;
+      const dia = hoje.getDate();
+      if (mes === 12) return true;
+      if (mes === 1 && dia <= 6) return true;
+      if (ano === 2026 && mes === 11 && dia >= 21) return true;
+      return false;
+    }
+
+    if (!dentroDaJanela(new Date())) return;
+
+    const corpo = document.body;
+    const cabecalho = document.querySelector(".site-header");
+    const semMovimento = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    let ligado = true;
+    try {
+      ligado = window.localStorage.getItem("amg-natal") !== "off";
+    } catch (e) {
+      ligado = true;
+    }
+
+    // ---------- elementos ----------
+    const tela = document.createElement("canvas");
+    tela.className = "natal-neve";
+    tela.setAttribute("aria-hidden", "true");
+    corpo.appendChild(tela);
+
+    const luzes = document.createElement("div");
+    luzes.className = "natal-luzes";
+    luzes.setAttribute("aria-hidden", "true");
+    const fio = document.createElement("div");
+    fio.className = "natal-fio";
+    luzes.appendChild(fio);
+    if (cabecalho) cabecalho.appendChild(luzes);
+
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = "natal-switch";
+    botao.textContent = "❄";
+    corpo.appendChild(botao);
+    corpo.classList.add("natal-disponivel");
+
+    // ---------- fio de lampadas ----------
+    const CORES = ["#ff5f5f", "#ffd34d", "#8ce5b2", "#74c9ff", "#ffa8de"];
+    let lampadas = [];
+
+    function montarLuzes() {
+      if (!cabecalho) return;
+      const largura = (cabecalho && cabecalho.clientWidth) || window.innerWidth;
+      const quantas = Math.max(8, Math.round(largura / 34));
+      lampadas.forEach((el) => el.remove());
+      lampadas = [];
+      for (let i = 0; i < quantas; i++) {
+        const el = document.createElement("span");
+        el.className = "natal-lamp";
+        el.style.setProperty("--lamp", CORES[i % CORES.length]);
+        el.style.setProperty("--atraso", (i % 7) * 180 + "ms");
+        el.style.left = (((i + 0.5) / quantas) * 100).toFixed(3) + "%";
+        el.addEventListener("pointerdown", onda.bind(null, i));
+        el.addEventListener("animationend", (ev) => {
+          if (ev.animationName === "natalEstouro") el.classList.remove("is-pulso");
+        });
+        luzes.appendChild(el);
+        lampadas.push(el);
+      }
+    }
+
+    // Acende a lampada tocada e propaga para os lados, uma a cada 55ms.
+    function onda(origem) {
+      lampadas.forEach((el, i) => {
+        const distancia = Math.abs(i - origem);
+        if (distancia > 7) return;
+        window.setTimeout(() => {
+          el.classList.remove("is-pulso");
+          void el.offsetWidth;
+          el.classList.add("is-pulso");
+        }, distancia * 55);
+      });
+    }
+
+    // ---------- neve ----------
+    const ctx = tela.getContext("2d");
+    const ponteiro = { x: -9999, y: -9999, ativo: false };
+    let flocos = [];
+    let larg = 0;
+    let alt = 0;
+    let quadro = 0;
+
+    function quantosFlocos() {
+      if (larg < 560) return 26;
+      if (larg < 960) return 46;
+      return 72;
+    }
+
+    function novoFloco(noTopo) {
+      return {
+        x: Math.random() * larg,
+        y: noTopo ? -Math.random() * 40 - 10 : Math.random() * alt,
+        r: 1.1 + Math.random() * 2.5,
+        queda: 0.24 + Math.random() * 0.7,
+        deriva: (Math.random() - 0.5) * 0.3,
+        fase: Math.random() * Math.PI * 2,
+        giro: 0.006 + Math.random() * 0.012,
+        empurraX: 0,
+        empurraY: 0,
+        alpha: 0.26 + Math.random() * 0.42
+      };
+    }
+
+    function semear() {
+      const alvo = quantosFlocos();
+      flocos = [];
+      for (let i = 0; i < alvo; i++) flocos.push(novoFloco(false));
+    }
+
+    function dimensionar() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      larg = window.innerWidth;
+      alt = window.innerHeight;
+      tela.width = Math.floor(larg * dpr);
+      tela.height = Math.floor(alt * dpr);
+      tela.style.width = larg + "px";
+      tela.style.height = alt + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = "#8fb6cc";
+      semear();
+    }
+
+    function passo() {
+      ctx.clearRect(0, 0, larg, alt);
+      for (let i = 0; i < flocos.length; i++) {
+        const f = flocos[i];
+        f.fase += f.giro;
+
+        // O cursor abre caminho na neve: quanto mais perto, mais o floco desvia.
+        if (ponteiro.ativo) {
+          const dx = f.x - ponteiro.x;
+          const dy = f.y - ponteiro.y;
+          const dist2 = dx * dx + dy * dy;
+          if (dist2 < 11000 && dist2 > 1) {
+            const dist = Math.sqrt(dist2);
+            const forca = (1 - dist / 105) * 0.85;
+            if (forca > 0) {
+              f.empurraX += (dx / dist) * forca;
+              f.empurraY += (dy / dist) * forca;
+            }
+          }
+        }
+
+        f.x += Math.sin(f.fase) * 0.42 + f.deriva + f.empurraX;
+        f.y += f.queda + f.empurraY;
+        f.empurraX *= 0.93;
+        f.empurraY *= 0.93;
+
+        if (f.y - f.r > alt) {
+          flocos[i] = novoFloco(true);
+          continue;
+        }
+        if (f.y + f.r < -60) f.y = -40;
+        if (f.x < -24) f.x = larg + 24;
+        if (f.x > larg + 24) f.x = -24;
+
+        ctx.globalAlpha = f.alpha;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      quadro = window.requestAnimationFrame(passo);
+    }
+
+    // Clique ou toque espalha os flocos em volta, como um sopro.
+    function sopro(x, y) {
+      for (const f of flocos) {
+        const dx = f.x - x;
+        const dy = f.y - y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 190 && dist > 1) {
+          const forca = (1 - dist / 190) * 6.5;
+          f.empurraX += (dx / dist) * forca;
+          f.empurraY += (dy / dist) * forca;
+        }
+      }
+    }
+
+    // ---------- ciclo ----------
+    function nevando() {
+      return ligado &&
+        !semMovimento.matches &&
+        !document.hidden &&
+        !corpo.classList.contains("simulator-mode");
+    }
+
+    function iniciar() {
+      if (quadro) return;
+      dimensionar();
+      quadro = window.requestAnimationFrame(passo);
+    }
+
+    function parar() {
+      if (!quadro) return;
+      window.cancelAnimationFrame(quadro);
+      quadro = 0;
+      ctx.clearRect(0, 0, larg, alt);
+    }
+
+    // Liga ou para o laco de desenho sem tocar em classe alguma do body,
+    // para nao realimentar o observador logo abaixo.
+    function revisar() {
+      if (nevando()) iniciar();
+      else parar();
+    }
+
+    function aplicar() {
+      corpo.classList.toggle("natal-on", ligado);
+      botao.setAttribute("aria-pressed", ligado ? "true" : "false");
+      const rotulo = ligado ? "Desligar decoração de Natal" : "Ligar decoração de Natal";
+      botao.setAttribute("aria-label", rotulo);
+      botao.title = rotulo;
+      revisar();
+    }
+
+    botao.addEventListener("click", () => {
+      ligado = !ligado;
+      try {
+        window.localStorage.setItem("amg-natal", ligado ? "on" : "off");
+      } catch (e) {
+        /* navegacao privada: a escolha vale so para esta visita */
+      }
+      aplicar();
+      if (ligado) onda(Math.floor(lampadas.length / 2));
+    });
+
+    // Repulsao so faz sentido com mouse; no toque o dedo nao fica sobre a tela.
+    window.addEventListener("pointermove", (ev) => {
+      if (ev.pointerType && ev.pointerType !== "mouse") return;
+      ponteiro.x = ev.clientX;
+      ponteiro.y = ev.clientY;
+      ponteiro.ativo = true;
+    }, { passive: true });
+
+    document.addEventListener("pointerleave", () => { ponteiro.ativo = false; });
+
+    window.addEventListener("pointerdown", (ev) => {
+      if (!quadro) return;
+      sopro(ev.clientX, ev.clientY);
+    }, { passive: true });
+
+    document.addEventListener("visibilitychange", revisar);
+
+    if (semMovimento.addEventListener) {
+      semMovimento.addEventListener("change", revisar);
+    }
+
+    // O simulador abre na propria home: a neve sai de cena enquanto ele esta aberto.
+    new MutationObserver(revisar).observe(corpo, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    let aguardando = 0;
+    window.addEventListener("resize", () => {
+      window.clearTimeout(aguardando);
+      aguardando = window.setTimeout(() => {
+        montarLuzes();
+        if (quadro) dimensionar();
+      }, 180);
+    });
+
+    montarLuzes();
+    aplicar();
+  })();
   </script>
 
 </body>
